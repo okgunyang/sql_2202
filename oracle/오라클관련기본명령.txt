@@ -1,0 +1,144 @@
+
+1. oracle sql plus 실행
+	1) cmd
+	2) sqlplus
+	3) system과 설치시 암호 입력
+
+2. scott 계정 추가 및 암호 변경
+	1) @C:\oraclexe\app\oracle\product\11.2.0\server\rdbms\admin\scott.sql  	//*.sql 파일 실행시에는 맨 앞에 @를 붙임
+	2) show user;
+	3) alter user scott identified by tiger;
+	4) quit					//scott 계정이므로 스스로 권한을 줄 수 없기 때문에 system 계정으로 재접속
+	5) sqlplus system/암호
+	6) grant connect, dba, resource to scott;			
+	7) alter user scott account unlock;
+	
+3. 사용자 추가와 권한 부여
+	1) create user 아이디 identified by 암호;		//사용자 추가
+	2) alter user 아이디 account unlock;		//사용자 잠금 해제
+	3) grant connect, dba, resource to 아이디;	//사용자 접속, DBA, 리소스 권한 부여
+	
+4. 사용자 전환
+	1) quit
+	2) sqlplus 아이디/암호
+	또는 
+	1) conn 아이디/암호
+	
+	
+5. 테이블 만들기 및 자료 추가
+	1) create table 테이블명(항목명1  데이터타입1, 항목명2  데이터타입2,....);	//테이블 생성
+	2) insert into 테이블명(항목명1, 항목명2,...) values (값1, 값2,...);	//레코드 추가
+	3) select 항목명1, 항목명2,...  from 테이블명 [where 조건];	//레코드 검색
+	4) update 테이블명 set 항목명=값 [where 조건];		//레코드 변경
+	5) delete from 테이블명 [where 조건];			//레코드 삭제
+	6) alter table 테이블명 add 항목명 데이터타입;		//항목 추가
+	7) alter table 테이블명 drop column 항목명;		//항목 변경
+	8) alter table 테이블명 rename to 변경할테이블명;		//테이블명 변경
+	9) alter table 테이블명 add constraints 테이블명 primary key (항목명);	//특정 항목을 기본키로 설정
+	10) drop table 테이블명;					//테이블 삭제
+	
+ 
+
+	참고 : 
+	  접속 : CONN 또는 CONNECT
+	  사용자 비밀번호 변경 : ALTER USER 아이디 IDENTIFIED BY 암호;
+	  DB에 생성된 계정 확인 : select username from ALL_users
+	  현재 로그인된 사용자 확인 : show user;
+	  사용자 추가 : create user 아이디 identified by 암호;
+	  사용자 삭제 : drop user 아이디;
+		      drop user 아이디 cascade;
+		      drop user 아이디 including contents;
+	  보안기능(profile을 사용하여 설정)
+		create profile 프로파일명 limit   //profile생성
+		password_life_time 10   //패스워드의 유효기간 10일
+		password_grace_time 5    //유효기간이 지나면 5일마다 경고메시지 출력
+		failed_login_attempts 5    //패스워드 5번 실패시 입력불가
+		password_lock_time 7;     //패스워드 5번 실패시 7일간 사용자 블럭
+		alter user 아이디 profile 프로파일명;    //프로파일을 유저한테 적용
+	  암호 만료 및 잠금
+		alter user 아이디 password expire;   //유저 비밀번호 만료시킴
+		alter user 아이디 account lock;    //유저 계정 블럭
+		alter user 아이디 account unlock;    //유저 계정 블럭 해제
+	  권한 부여 : grant 권한타입 to 아이디;
+	  권한 회수 : revoke 권한타입 from 아이디;
+	  권한 타입(privilige)
+	          System 권한
+		 CREATE USER	 	데이터 베이스 유저 생성 권한
+		 SELECT ANY TABLE 	모든 유저의 테이블 레코드 조회 권한
+		 UPDATE ANY TABLE	모든 유저의 테이블 레코드 수정 권한
+		 DELETE ANY TABLE	모든 유저의 테이블 레코드 삭제 권한
+		 INSERT ANY TABLE		모든 유저의 테이블 레코드 추가 권한		
+
+		 CREATE ANY TABLE 	모든 유저의 테이블 생성 권한
+		 CREATE TABLE		테이블 생성 권한
+		 CREATE VIEW		뷰 생성 권한
+		 CREATE PROCED USER	프로시저 생성 권한
+		 CREATE SEQUENCE	시퀀스 생성 권한
+
+		 CREATE SESSION		다른 사용자에게 데이터베이스 생성 권한을 줄 수 있는 권한
+		 ALTER SESSION		다른 사용자에게 데이터베이스 수정 권한을 줄 수 있는 권한
+		 DROP SESSION		다른 사용자에게 데이터베이스 삭제 권한을 줄 수 있는 권한		 
+
+		 SYSDBA			데이터베이스를 관리하는 최고 권한
+		 SYSOPER			데이터베이스를 관리하는 권한
+
+
+	          특정 테이블(Object)의 DML 접근권한
+		 grant 권한타입 on 테이블명
+		 SELECT			레코드 검색 권한
+		 UPDATE			레코드 수정 권한
+		 INSERT			레코드 삽입 권한
+		 DELETE			레코드 삭제 권한
+		 REFERENCES		참조 권한
+		 ALL			
+
+
+	          기본 제공 권한 (ROLE)
+		 CONNECT		데이터베이스에 접속할 수 있는 로그인 권한
+		 RESOURCE		기본적인 객체(테이블,인덱스,뷰,클러스트등) 생성, 변경, 삭제할 수 있는 권한을 가진 롤
+		 DBA 			오라클 데이터베이스를 관리하기 위해 필요한 권한을 가진 롤
+		 exp_full_database, imp_full_database   데이터베이스에서 제공하는 expert, import툴을 사용할 수 있는 권한을 가진 롤
+		 sysdba 			sysoper 롤 권한과 더불어 데이터베이스를 생성할 수 있는 권한을 가진 롤(DBA사용자)
+		 sysoper			데이터베이스의 시작과 종료 및 모든 관리를 하기 위해 필요한 권한을 가진 롤(system사용자)
+
+
+
+	desc 테이블명 				테이블 구조 보기
+
+
+
+      ※ SQL 파일 및 버퍼 관련 명령	
+	save 드라이브명:\디렉토리명\파일명.sql		버퍼에 있는 내용을 sql파일로 저장
+	get 드라이브명:\디렉토리명\파일명.sql		sql파일을 버퍼로 불러와 실행
+	@드라이브명:\디렉토리명\파일명.sql		sql파일의 내용을 직접 실행 
+	spool 드라이브명:\디렉토리명\파일명.sql		앞으로 진행하는 작업들을 sql파일로 저장 시작
+	spool off					sql 파일 저장 종료
+	exit					sqlplus 종료/터미널 모드 종료
+	host					잠시 터미널 모드로 변경
+
+	clear buffer				버퍼 비우기
+	L					작업 리스트 중 가장 최근 것 보기(LIST)
+	r					버퍼에 저장된 SQL문을 보여주고 실행(RUN)
+	ed					메모장으로 sql 파일 편집 (EDIT)
+	A {문자열}					현재 버퍼의 끝에 새로운 문자열 추가
+	C					현재 행의 문자열을 바꾸기
+	I					버퍼에 새로운 행을 추가
+	/					버퍼 전체행 실행
+	DEL   n					n번째 행 삭제
+	N					해당 번째 행의 내용 출력
+
+		ex1) SQL> c/enume/ename [enter] -> enume 를 ename 으로 치환
+		ex2) SQL> 1 [enter]		-> 1번째 행 출력
+				
+
+	
+
+
+
+
+
+
+
+
+		
+
